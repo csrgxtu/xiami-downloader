@@ -13,6 +13,7 @@ from xiami_dl import get_downloader
 from xiami_util import query_yes_no
 
 # ID3 tags support depends on Mutagen
+'''
 try:
     import mutagen
     import mutagen.mp3
@@ -20,7 +21,7 @@ try:
 except:
     mutagen = None
     sys.stderr.write("No mutagen available. ID3 tags won't be written.\n")
-
+'''
 
 VERSION = '0.3.0'
 
@@ -138,6 +139,8 @@ def parse_arguments():
     parser.add_argument('-s', '--song', action='append',
                         help='adds songs for download',
                         type=int, nargs='+')
+    parser.add_argument('-o', '--output', action='append',
+                        help="output file, i.e the mp3 to be stored")
     parser.add_argument('-a', '--album', action='append',
                         help='adds all songs in the albums for download',
                         type=int, nargs='+')
@@ -276,7 +279,18 @@ def add_id3_tag(filename, track):
 
 def main():
     args = parse_arguments()
-
+    tmp = len(args.output)
+    if tmp != 1:
+      print "[Usage] Please specify output file with -o"
+      return 1
+    #print "Len: ", len(args.output)
+    #return
+    #print "args: ", args
+    #return
+    #print "Debug: "
+    #print args.output[0]
+    #return
+    
     xiami = XiamiDownloader(args)
 
     urls = []
@@ -308,15 +322,22 @@ def main():
 
         output_file = xiami.format_output(folder, filename)
 
+        '''
         if not os.path.exists(folder):
             os.makedirs(folder)
-
+        '''
+        
         println('\n[%d/%d] %s' % (i + 1, len(tracks), output_file))
-        downloaded = xiami.download(track['url'], output_file)
+        #print "Debug: ", track['url']
+        #print "Debug: ", output_file
+        #return
+        #downloaded = xiami.download(track['url'], output_file)
+        downloaded = xiami.download(track['url'], args.output[0])
 
+        '''
         if mutagen and downloaded and (not args.no_tag):
             add_id3_tag(output_file, track)
-
+        '''
 
 if __name__ == '__main__':
     main()
